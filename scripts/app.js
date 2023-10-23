@@ -1,6 +1,7 @@
 const TodosApp = {
   data() {
     return {
+      isLoading: false,
       todos: [],
       enteredTodoText: "",
       editedTodoId: null,
@@ -26,7 +27,6 @@ const TodosApp = {
         this.editedTodoId = null;
       } else {
         // Creating...
-
         let response;
 
         try {
@@ -50,6 +50,7 @@ const TodosApp = {
         }
 
         const responseData = await response.json();
+
         const newTodo = {
           text: this.enteredTodoText,
           id: responseData.createdTodo.id,
@@ -72,6 +73,27 @@ const TodosApp = {
         return todoItem.id !== todoId;
       });
     },
+  },
+  async created() {
+    let response;
+    this.isLoading = true;
+    try {
+      response = await fetch("http://localhost:3000/todos");
+    } catch (error) {
+      alert("Something went wrong!");
+      this.isLoading = false;
+      return;
+    }
+
+    this.isLoading = false;
+
+    if (!response.ok) {
+      alert("Something went wrong!");
+      return;
+    }
+
+    const responseData = await response.json();
+    this.todos = responseData.todos;
   },
 };
 
